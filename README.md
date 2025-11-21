@@ -16,6 +16,35 @@ An intelligent anime recommendation system powered by **LangGraph**, **LLMs**, a
 - **🧩 Modular Architecture**: Clean, maintainable code with separated UI and API components
 - **☁️ Cloud-Ready**: Optimized for deployment on Streamlit Cloud, AWS, GCP, and Azure
 
+## 🎬 Demo
+
+### Screenshots
+
+The app features a clean, modern interface with:
+- **Interactive search** with real-time query input
+- **10 anime recommendations** with cover images loaded in parallel
+- **Clickable titles** that link to Google search
+- **Full synopsis** from MyAnimeList in expandable sections
+- **Performance metrics** showing cache effectiveness
+
+> **Note**: Screenshots are available in the [`demo/`](demo/) folder. To capture your own:
+> 1. Run `uv run streamlit run app.py`
+> 2. Navigate to `http://localhost:8501`
+> 3. Try queries like "I want a shonen anime with good fights"
+> 4. Take screenshots and save to `demo/` folder
+
+### Live Demo
+
+Try the app locally:
+```bash
+uv run streamlit run app.py
+```
+
+Then visit `http://localhost:8501` and try queries like:
+- "I want a psychological thriller anime"
+- "Recommend me a slice of life anime with comedy"
+- "Show me anime similar to Attack on Titan"
+
 ## 🏗️ Architecture
 
 The system follows a three-stage graph-based pipeline:
