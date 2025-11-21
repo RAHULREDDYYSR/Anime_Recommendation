@@ -27,6 +27,8 @@ The app features a clean, modern interface with:
 - **Full synopsis** from MyAnimeList in expandable sections
 - **Performance metrics** showing cache effectiveness
 
+![Demo Image](demo/demo_img.png)
+
 > **Note**: Screenshots are available in the [`demo/`](demo/) folder. To capture your own:
 > 1. Run `uv run streamlit run app.py`
 > 2. Navigate to `http://localhost:8501`
