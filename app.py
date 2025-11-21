@@ -1,29 +1,32 @@
+"""
+Main Streamlit application for anime recommendations.
+"""
 import streamlit as st
 import time
 from graph.graph import app
+from ui.components import (
+    render_custom_css,
+    render_sidebar,
+    render_recommendations,
+    render_footer
+)
 
+# Page configuration
 st.set_page_config(
     page_title="Anime Recommendation System",
     page_icon="🎌",
     layout="wide"
 )
 
+# Apply custom styling
+render_custom_css()
+
+# Header
 st.title("🎌 Anime Recommendation System")
 st.markdown("Powered by AI and semantic search")
 
-# Sidebar
-with st.sidebar:
-    st.header("About")
-    st.markdown("""
-    This system uses:
-    - **LangGraph** for workflow
-    - **LLMs** for query refinement
-    - **Semantic Search** for recommendations
-    - **Pinecone** vector database
-    """)
-    
-    st.header("Settings")
-    num_recommendations = st.slider("Number of recommendations", 1, 10, 3)
+# Sidebar with settings
+num_recommendations, show_images = render_sidebar()
 
 # Main interface
 user_query = st.text_input(
@@ -37,23 +40,16 @@ if st.button("Get Recommendations", type="primary") or user_query:
             start_time = time.time()
             
             try:
-                # Update the number of recommendations in the graph
+                # Get recommendations from the graph
                 result = app.invoke({"input_text": user_query})
-                
                 end_time = time.time()
                 
-                # Display results
-                st.success(f"Found recommendations in {end_time - start_time:.2f} seconds!")
+                # Display success message
+                st.success(f"✨ Found recommendations in {end_time - start_time:.2f} seconds!")
                 
-                st.subheader("Recommended Anime:")
-                
+                # Render recommendations
                 recommendations = result.get('recommended_anime', [])
-                
-                if recommendations:
-                    for idx, anime in enumerate(recommendations[:num_recommendations], 1):
-                        st.markdown(f"**{idx}. {anime}**")
-                else:
-                    st.warning("No recommendations found. Try a different query!")
+                render_recommendations(recommendations, num_recommendations, show_images)
                     
             except Exception as e:
                 st.error(f"An error occurred: {e}")
@@ -61,5 +57,4 @@ if st.button("Get Recommendations", type="primary") or user_query:
         st.warning("Please enter a query to get recommendations!")
 
 # Footer
-st.markdown("---")
-st.markdown("Built with ❤️ using LangChain, LangGraph, and Streamlit")
+render_footer()

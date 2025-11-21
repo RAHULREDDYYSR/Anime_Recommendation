@@ -7,16 +7,21 @@ An intelligent anime recommendation system powered by **LangGraph**, **LLMs**, a
 - **🤖 AI-Powered Query Refinement**: Uses LLMs to understand and refine user queries for better search results
 - **🔍 Semantic Search**: Leverages vector embeddings (Sentence Transformers) and Pinecone for intelligent similarity search
 - **📊 Graph-Based Workflow**: Built with LangGraph for modular, stateful recommendation pipeline
-- **🎯 Contextual Recommendations**: Provides top 5 anime recommendations based on genres, themes, and user preferences
+- **🎯 10 Personalized Recommendations**: Provides top 10 anime recommendations based on genres, themes, and user preferences
 - **⚡ Optimized Performance**: Smart caching reduces query time from 10s to ~1.2s (9.4x faster)
-- **🎨 Streamlit Web Interface**: Beautiful, interactive web app for easy access
+- **🚀 Parallel Image Loading**: Fetches all anime images concurrently for instant display
+- **🎨 Streamlit Web Interface**: Beautiful, interactive web app with clickable anime titles
+- **🔗 Google Search Integration**: Click any anime title to search for more information
+- **📖 Full Synopsis**: Complete anime descriptions from MyAnimeList
+- **🧩 Modular Architecture**: Clean, maintainable code with separated UI and API components
 - **☁️ Cloud-Ready**: Optimized for deployment on Streamlit Cloud, AWS, GCP, and Azure
 
 ## 🏗️ Architecture
 
 The system follows a three-stage graph-based pipeline:
-2. **Semantic Search** (`anime_semantic_search`): Retrieves top 5 relevant anime from Pinecone vector database
-3. **Recommendation Generation** (`anime_recommendation`): Uses LLM to select the best 5 anime from retrieved context
+1. **Query Refinement** (`redefine_input`): Analyzes and refines the user's raw input into a precise search query
+2. **Semantic Search** (`anime_semantic_search`): Retrieves top 10 relevant anime from Pinecone vector database
+3. **Recommendation Generation** (`anime_recommendation`): Uses LLM to select the best 10 anime from retrieved context
 
 ## 🛠️ Tech Stack
 
@@ -107,9 +112,12 @@ Then open your browser to `http://localhost:8501`
 
 **Features:**
 - Interactive query input
-- Adjustable number of recommendations
+- Adjustable number of recommendations (1-10)
 - Real-time performance metrics
 - Beautiful, responsive UI
+- **Clickable anime titles** with Google search integration
+- **Parallel image loading** for instant display
+- **Full synopsis** from MyAnimeList
 
 ### Command Line Interface
 
@@ -164,7 +172,7 @@ Edit [graph/nodes.py](file:///c:/Users/rahul/work_space/LLM/llmOps/Anime_Recomme
 context = retrieve_anime_recommendations(query=query, k=10)
 
 # Change number of final recommendations
-prompt = f"""Recommend the best 5 anime titles..."""
+prompt = f"""Recommend the best 10 anime titles..."""
 ```
 
 ## 📁 Project Structure
@@ -174,14 +182,18 @@ Anime_Recommendation/
 ├── graph/
 │   ├── chains.py          # LLM initialization and structured outputs
 │   ├── graph.py           # LangGraph workflow definition
-│   ├── nodes.py           # Graph node implementations
+│   ├── nodes.py           # Graph node implementations (10 recommendations)
 │   ├── schemas.py         # Pydantic schemas for validation
 │   └── state.py           # Graph state definition
+├── ui/
+│   ├── __init__.py        # UI package initializer
+│   └── components.py      # Streamlit UI components (modular design)
 ├── utils/
+│   ├── api_utils.py       # Jikan API integration for anime metadata
 │   └── vectore_search.py  # Optimized semantic search with caching
 ├── Data/
 │   └── anime_with_synopsis.csv  # Anime dataset
-├── app.py                 # Streamlit web interface
+├── app.py                 # Streamlit web interface (main entry)
 ├── data_ingestion.py      # Script to ingest data into Pinecone
 ├── main.py                # CLI entry point with benchmarks
 ├── .env                   # Environment variables (not tracked)
