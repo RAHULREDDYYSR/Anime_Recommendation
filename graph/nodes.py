@@ -19,7 +19,7 @@ def anime_semantic_search(state: GraphState) -> GraphState:
 def anime_recommendation(state: GraphState) -> GraphState:
     query = state['redefine_input_content']
     context = state['context']
-    prompt = f"""You are an expert Anime Recommender. Recommend the best 3 anime titles based strictly on the Retrieved Context provided below that match the User’s Request..
+    prompt = f"""You are an expert Anime Recommender. Recommend the best 5 anime titles based strictly on the Retrieved Context provided below that match the User’s Request..
     \n\n user's Request: {state['redefine_input_content']}.... \n\n --------\n retrived Context: {context}
     """
     state['recommended_anime'] = recommended_Anime_llm.invoke(prompt).anime_titles

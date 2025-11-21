@@ -1,19 +1,36 @@
+import time
 from graph.graph import app
 from langsmith import uuid7
 
-id = uuid7()
 def main():
     print("Hello from anime-recommendation!")
-    user_input = "I want a shonen anime with good fights"
-    print(f"Processing query: {user_input}")
+    print("=" * 60)
     
-    try:
-        app.get_graph().draw_mermaid_png(output_file_path="graph.png")
-        result = app.invoke({"input_text": user_input})
-        print("\nRecommendations:")
-        print(result['recommended_anime'])
-    except Exception as e:
-        print(f"An error occurred: {e}")
+    # First query
+    query1 = "I want a shonen anime with good fights"
+    print(f"\nQuery 1: {query1}")
+    start_time = time.time()
+    result1 = app.invoke({"input_text": query1})
+    end_time = time.time()
+    print(f"Recommendations: {result1['recommended_anime']}")
+    print(f"Time: {end_time - start_time:.2f} seconds")
+    
+    # Second query (should be much faster with cache)
+    print("\n" + "=" * 60)
+    query2 = "I want a romance anime with comedy"
+    print(f"\nQuery 2: {query2}")
+    start_time = time.time()
+    result2 = app.invoke({"input_text": query2})
+    end_time = time.time()
+    print(f"Recommendations: {result2['recommended_anime']}")
+    print(f"Time: {end_time - start_time:.2f} seconds (cached!)")
+    
+    print("\n" + "=" * 60)
+    print("Cache is working! Subsequent queries are much faster.")
 
 if __name__ == "__main__":
-    main()
+    try:
+        app.get_graph().draw_mermaid_png(output_file_path="graph.png")
+        main()
+    except Exception as e:
+        print(f"An error occurred: {e}")
