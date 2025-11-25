@@ -12,15 +12,26 @@ def redefine_input(state: GraphState) -> GraphState:
 
 def anime_semantic_search(state: GraphState) -> GraphState:
     query = state['redefine_input_content']
-    context = retrieve_anime_recommendations(query=query, k=10)
+    context = retrieve_anime_recommendations(query=query, k=15)
     state['context'] = context
     return state
     
 def anime_recommendation(state: GraphState) -> GraphState:
     query = state['redefine_input_content']
     context = state['context']
-    prompt = f"""You are an expert Anime Recommender. Recommend the best 10 anime titles based strictly on the Retrieved Context provided below that match the User's Request..
+    prompt = f"""You are an expert Anime Recommender. Recommend the best 10 anime titles based strictly on the Retrieved Context provided below that match the User's Request.
+    For each recommendation, extract the following details from the context:
+    - Title
+    - Description (Synopsis)
+    - Score
+    - Image URL
+    - Episodes
+    - Rating (Age Rating)
+    - Genres
+    - Demographic
+
     \n\n user's Request: {state['redefine_input_content']}.... \n\n --------\n retrived Context: {context}
     """
+    # The LLM is already bound with the RecommendedAnime schema which contains the list of AnimeDetails
     state['recommended_anime'] = recommended_Anime_llm.invoke(prompt).anime_titles
     return state

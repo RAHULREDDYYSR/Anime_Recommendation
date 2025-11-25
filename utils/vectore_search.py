@@ -66,7 +66,7 @@ def _get_vectorstore_streamlit():
     if not embeddings:
         return None
     
-    index_name = "anime-recommendation"
+    index_name = "anime-recommendation-v2"
     print(f"Connecting to Pinecone index '{index_name}' (cached by Streamlit)...")
     
     vectorstore = PineconeVectorStore(
@@ -85,7 +85,7 @@ def _get_vectorstore_global():
         if not embeddings:
             return None
         
-        index_name = "anime-recommendation"
+        index_name = "anime-recommendation-v2"
         print(f"Connecting to Pinecone index '{index_name}' (first time only)...")
         
         _vectorstore_cache = PineconeVectorStore(

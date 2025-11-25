@@ -16,6 +16,7 @@ dependencies = [
     "langgraph>=1.0.3",
     "langsmith>=0.4.45",
     "pandas>=2.3.3",
+    "pinecone>=7.3.0",
     "pydantic>=2.12.4",
     "python-dotenv>=1.2.1",
     "sentence-transformers>=5.1.2",

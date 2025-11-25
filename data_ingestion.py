@@ -17,15 +17,23 @@ def extract_data(file_path):
         documents = []
         for _, row in df.iterrows():
             # Construct the text content
-            text = f"Title: {row['Name']}\nGenres: {row['Genres']}\nSynopsis: {row['sypnopsis']}"
+            text = f"Title: {row['title']}\nGenres: {row['Genres']}\nSynopsis: {row['description']}\nThemes: {row['Themes']}"
             
             # Create a Document object
             # We can store metadata as well if needed, e.g., the ID or Score
             metadata = {
-                "id": str(row['MAL_ID']),
+                "id": str(row['myanimelist_id']),
+                "title": row['title'],
                 "score": row['Score'],
-                "genres": row['Genres']
+                "genres": row['Genres'],
+                "episodes": row['Episodes'],
+                "image_url": row['image'],
+                "rating": row['Rating'],
+                "demographic": row['Demographic']
             }
+            # Clean up metadata to remove NaN values which Pinecone might not like
+            metadata = {k: v for k, v in metadata.items() if pd.notna(v)}
+            
             doc = Document(page_content=text, metadata=metadata)
             documents.append(doc)
         
@@ -64,19 +72,25 @@ def ingest_embeddings(documents, index_name):
         existing_indexes = [index.name for index in pc.list_indexes()]
         
         if index_name in existing_indexes:
-            print(f"Database already ingested. Index '{index_name}' exists.")
-            return
+            print(f"Index '{index_name}' exists. Checking if it needs update...")
+            # For now, we will just print a message. In a real scenario, we might check doc counts or force update.
+            # But the user asked to ingest, so we might want to overwrite or add.
+            # Since we are changing schema, it is safer to delete and recreate or just add.
+            # Let's just add for now, but usually one would want to clear old data if schema changes drastically.
+            # However, the user didn't explicitly ask to delete. I'll proceed with adding.
+            pass
 
-        print(f"Creating index {index_name}...")
-        pc.create_index(
-            name=index_name,
-            dimension=384, # Dimension for all-MiniLM-L6-v2
-            metric="cosine",
-            spec=ServerlessSpec(
-                cloud="aws",
-                region="us-east-1"
-            ) 
-        )
+        if index_name not in existing_indexes:
+            print(f"Creating index {index_name}...")
+            pc.create_index(
+                name=index_name,
+                dimension=384, # Dimension for all-MiniLM-L6-v2
+                metric="cosine",
+                spec=ServerlessSpec(
+                    cloud="aws",
+                    region="us-east-1"
+                ) 
+            )
         
         print(f"Ingesting {len(documents)} documents into index '{index_name}'...")
         
@@ -93,12 +107,15 @@ def ingest_embeddings(documents, index_name):
 
 if __name__ == "__main__":
     # Example usage
-    DATA_PATH = "data/anime_with_synopsis.csv"
-    INDEX_NAME = "anime-recommendation"
+    DATA_PATH = "Data/mal_anime.csv"
+    INDEX_NAME = "anime-recommendation-v2"
     
     if os.path.exists(DATA_PATH):
         docs = extract_data(DATA_PATH)
         if docs:
+            # Ingest only a subset for testing if needed, or all. 
+            # The file is large (19k lines), might take a while. 
+            # I'll ingest all as requested.
             ingest_embeddings(docs, INDEX_NAME)
             
     else:

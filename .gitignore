@@ -7,5 +7,23 @@ wheels/
 *.egg-info
 /.env
 # Virtual environments
-.env
 
+# Virtual environments
+.env
+.venv/
+env/
+venv/
+
+# Data
+Data/
+
+# Logs
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Test and Verify scripts
+test_*.py
+verify_changes.py

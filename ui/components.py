@@ -2,9 +2,7 @@
 UI components for the Streamlit anime recommendation app.
 """
 import streamlit as st
-from concurrent.futures import ThreadPoolExecutor, as_completed
-from utils.api_utils import get_anime_image
-
+import urllib.parse
 
 def render_custom_css():
     """Apply custom CSS styling to the app."""
@@ -44,90 +42,86 @@ def render_sidebar():
         return num_recommendations, show_images
 
 
-def fetch_anime_info_batch(anime_names: list):
-    """
-    Fetch anime information for multiple anime in parallel.
-    
-    Args:
-        anime_names: List of anime names to fetch
-        
-    Returns:
-        dict: Dictionary mapping anime names to their info
-    """
-    anime_info_dict = {}
-    
-    # Use ThreadPoolExecutor for parallel API calls
-    with ThreadPoolExecutor(max_workers=5) as executor:
-        # Submit all tasks
-        future_to_anime = {
-            executor.submit(get_anime_image, anime): anime 
-            for anime in anime_names
-        }
-        
-        # Collect results as they complete
-        for future in as_completed(future_to_anime):
-            anime = future_to_anime[future]
-            try:
-                anime_info_dict[anime] = future.result()
-            except Exception as e:
-                print(f"Error fetching {anime}: {e}")
-                anime_info_dict[anime] = None
-    
-    return anime_info_dict
-
-
-def render_anime_card_with_image(idx: int, anime_name: str, anime_info: dict = None):
+def render_anime_card_with_image(idx: int, anime: object):
     """
     Render an anime recommendation card with image and metadata.
     
     Args:
         idx: Index number for the recommendation
-        anime_name: Name of the anime
-        anime_info: Pre-fetched anime information (optional)
+        anime: AnimeDetails object containing anime information
     """
-    import urllib.parse
-    
+    # Handle both Pydantic object and dict
+    if isinstance(anime, dict):
+        title = anime.get('title', 'Unknown Title')
+        image_url = anime.get('image_url')
+        score = anime.get('score')
+        episodes = anime.get('episodes')
+        rating = anime.get('rating')
+        genres = anime.get('genres')
+        description = anime.get('description')
+    else:
+        title = getattr(anime, 'title', 'Unknown Title')
+        image_url = getattr(anime, 'image_url', None)
+        score = getattr(anime, 'score', None)
+        episodes = getattr(anime, 'episodes', None)
+        rating = getattr(anime, 'rating', None)
+        genres = getattr(anime, 'genres', None)
+        description = getattr(anime, 'description', None)
+
     with st.container():
         col1, col2 = st.columns([1, 3])
         
         with col1:
             # Display anime image
-            if anime_info and anime_info.get('image_url'):
-                st.image(anime_info['image_url'], width=150)
+            if image_url:
+                st.image(image_url, width=150)
             else:
                 st.image("https://via.placeholder.com/150x200?text=No+Image", width=150)
         
         with col2:
             # Create Google search link
-            search_query = urllib.parse.quote(f"{anime_name} anime")
+            search_query = urllib.parse.quote(f"{title} anime")
             google_search_url = f"https://www.google.com/search?q={search_query}"
             
             # Display title with Google search link
-            st.markdown(f"### {idx}. [{anime_name}]({google_search_url})")
+            st.markdown(f"### {idx}. [{title}]({google_search_url})")
             
-            if anime_info:
-                if anime_info.get('score'):
-                    st.markdown(f"⭐ **Score:** {anime_info['score']}/10")
-                if anime_info.get('episodes'):
-                    st.markdown(f"📺 **Episodes:** {anime_info['episodes']}")
-                if anime_info.get('year'):
-                    st.markdown(f"📅 **Year:** {anime_info['year']}")
-                if anime_info.get('synopsis'):
-                    with st.expander("📖 Synopsis"):
-                        st.write(anime_info['synopsis'])
+            # Display metadata
+            meta_cols = st.columns(3)
+            with meta_cols[0]:
+                if score:
+                    st.markdown(f"⭐ **Score:** {score}/10")
+            with meta_cols[1]:
+                if episodes:
+                    st.markdown(f"📺 **Episodes:** {episodes}")
+            with meta_cols[2]:
+                if rating:
+                    st.markdown(f"🔞 **Rating:** {rating}")
+            
+            if genres:
+                st.markdown(f"🎭 **Genres:** {genres}")
+
+            if description:
+                with st.expander("📖 Synopsis"):
+                    st.write(description)
         
         st.markdown("---")
 
 
-def render_anime_card_simple(idx: int, anime_name: str):
+def render_anime_card_simple(idx: int, anime: object):
     """
     Render a simple anime recommendation card without image.
     
     Args:
         idx: Index number for the recommendation
-        anime_name: Name of the anime
+        anime: AnimeDetails object or dict
     """
-    st.markdown(f"**{idx}. {anime_name}**")
+    if isinstance(anime, dict):
+        title = anime.get('title', 'Unknown Title')
+    else:
+        title = getattr(anime, 'title', 'Unknown Title')
+        
+    st.markdown(f"**{idx}. {title}**")
 
 
 def render_recommendations(recommendations: list, num_recommendations: int, show_images: bool, layout_style: str = "List"):
@@ -135,7 +129,7 @@ def render_recommendations(recommendations: list, num_recommendations: int, show
     Render the list of anime recommendations.
     
     Args:
-        recommendations: List of anime names
+        recommendations: List of AnimeDetails objects
         num_recommendations: Number of recommendations to display
         show_images: Whether to show images or not
         layout_style: Layout style (for future expansion)
@@ -143,17 +137,13 @@ def render_recommendations(recommendations: list, num_recommendations: int, show
     st.subheader("🎬 Recommended Anime:")
     
     if recommendations:
-        if show_images:
-            # Fetch all anime info in parallel
-            anime_list = recommendations[:num_recommendations]
-            with st.spinner("Loading anime details..."):
-                anime_info_dict = fetch_anime_info_batch(anime_list)
-            
-            # Render cards with pre-fetched data
-            for idx, anime in enumerate(anime_list, 1):
-                render_anime_card_with_image(idx, anime, anime_info_dict.get(anime))
-        else:
-            for idx, anime in enumerate(recommendations[:num_recommendations], 1):
+        # Limit recommendations
+        anime_list = recommendations[:num_recommendations]
+        
+        for idx, anime in enumerate(anime_list, 1):
+            if show_images:
+                render_anime_card_with_image(idx, anime)
+            else:
                 render_anime_card_simple(idx, anime)
     else:
         st.warning("No recommendations found. Try a different query!")

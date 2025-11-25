@@ -9,15 +9,17 @@ st.title("UI Component Test")
 
 # Dummy data
 anime_info = {
+    "title": "Fullmetal Alchemist: Brotherhood",
     "image_url": "https://cdn.myanimelist.net/images/anime/1223/96541.jpg",
     "score": "9.14",
     "episodes": "64",
-    "year": "2009",
-    "synopsis": "Fullmetal Alchemist: Brotherhood is a 2009 Japanese anime television series adapted from the original Fullmetal Alchemist manga series by Hiromu Arakawa."
+    "rating": "R - 17+ (violence & profanity)",
+    "genres": "Action, Adventure, Drama, Fantasy",
+    "description": "Fullmetal Alchemist: Brotherhood is a 2009 Japanese anime television series adapted from the original Fullmetal Alchemist manga series by Hiromu Arakawa."
 }
 
 st.header("Modern Anime Card")
-render_anime_card_with_image(1, "Fullmetal Alchemist: Brotherhood", anime_info)
+render_anime_card_with_image(1, anime_info)
 
 st.header("Card without Info")
-render_anime_card_with_image(2, "Unknown Anime", None)
+render_anime_card_with_image(2, {"title": "Unknown Anime"})
