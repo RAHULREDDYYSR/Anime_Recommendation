@@ -3,7 +3,6 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from .schemas import RecommendedAnime, RefinedQuery
 from langchain_openai import ChatOpenAI
 
-
 def get_llm_chains(model_name: str = "Groq"):
     """
     Returns the LLM chains for refine_input and recommended_anime based on the selected model.

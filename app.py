@@ -47,9 +47,9 @@ if st.button("Get Recommendations", type="primary") or user_query:
                 # Display success message
                 st.success(f"✨ Found recommendations in {end_time - start_time:.2f} seconds!")
                 
-                # Render recommendations
+                # Render recommendations with images
                 recommendations = result.get('recommended_anime', [])
-                render_recommendations(recommendations, num_recommendations, show_images)
+                render_recommendations(recommendations)
                     
             except Exception as e:
                 st.error(f"An error occurred: {e}")
