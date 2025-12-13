@@ -5,7 +5,7 @@ from langchain_openai import ChatOpenAI
 
 #llm = ChatGoogleGenerativeAI(model='gemini-2.5-flash-lite')
 #llm = ChatOpenAI(model='gpt-4.1-nano')
-llm = ChatGroq(model='llama-3.3-70b-versatile')
+llm = ChatGroq(model='openai/gpt-oss-20b')
 
 # Ollama LLM chain for gpt-oss:120b-cloud
 
