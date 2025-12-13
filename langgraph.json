@@ -1,0 +1,7 @@
+{
+  "dependencies": ["."],
+  "graphs": {
+    "anime_recommendation": "./graph/graph.py:app"
+  },
+  "env": ".env"
+}

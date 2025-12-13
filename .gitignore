@@ -27,3 +27,7 @@ Thumbs.db
 # Test and Verify scripts
 test_*.py
 verify_changes.py
+
+chroma_db/
+
+chroma_db_openai/

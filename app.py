@@ -26,7 +26,7 @@ st.title("🎌 Anime Recommendation System")
 st.markdown("Powered by AI and semantic search")
 
 # Sidebar with settings
-num_recommendations, show_images = render_sidebar()
+num_recommendations, show_images, vector_source, embedding_model, llm_model = render_sidebar()
 
 # Main interface
 user_query = st.text_input(
@@ -41,7 +41,7 @@ if st.button("Get Recommendations", type="primary") or user_query:
             
             try:
                 # Get recommendations from the graph
-                result = app.invoke({"input_text": user_query})
+                result = app.invoke({"input_text": user_query, "vector_source": vector_source, "embedding_model": embedding_model, "llm_model": llm_model})
                 end_time = time.time()
                 
                 # Display success message

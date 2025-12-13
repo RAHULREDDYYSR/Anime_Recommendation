@@ -1,5 +1,5 @@
 from .state import GraphState
-from .chains import recommended_Anime_llm, redefine_input_llm
+from .chains import get_llm_chains
 from utils.vectore_search import retrieve_anime_recommendations
 from langchain_core.messages import SystemMessage, HumanMessage
 
@@ -21,12 +21,15 @@ Focus on:
 - Creating a search-optimized query that will retrieve the most relevant anime recommendations"""
         ),
         HumanMessage(
-            content=f"""Please refine the following user input into a detailed and precise query:
+            content=f"""Please refine the following  input into a detailed and precise query:
 
-User Input: {state['input_text']}"""
+    Input: {state['input_text']}"""
         )
     ]
     
+    llm_model = state.get('llm_model', 'Groq')
+    redefine_input_llm, _ = get_llm_chains(llm_model)
+
     response = redefine_input_llm.invoke(messages)
     state['redefine_input_content'] = response.refined_query
     return state
@@ -36,7 +39,9 @@ def anime_semantic_search(state: GraphState) -> GraphState:
     Performs semantic search to retrieve relevant anime recommendations from the vector database.
     """
     query = state['redefine_input_content']
-    context = retrieve_anime_recommendations(query=query, k=15)
+    vector_source = state.get('vector_source', 'Pinecone')
+    embedding_model = state.get('embedding_model', 'HuggingFace')
+    context = retrieve_anime_recommendations(query=query, k=15, source=vector_source, embedding_model=embedding_model)
     state['context'] = context
     return state
     
@@ -83,6 +88,9 @@ Please extract and return the 10 best matching anime with all required details."
         )
     ]
     
+    llm_model = state.get('llm_model', 'Groq')
+    _, recommended_Anime_llm = get_llm_chains(llm_model)
+
     # The LLM is already bound with the RecommendedAnime schema which contains the list of AnimeDetails
     state['recommended_anime'] = recommended_Anime_llm.invoke(messages).anime_titles
     return state

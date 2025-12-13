@@ -4,8 +4,8 @@ load_dotenv()
 
 from typing import Literal
 from langgraph.graph import StateGraph, END
-from .state import GraphState
-from .nodes import (
+from graph.state import GraphState
+from graph.nodes import (
     redefine_input, anime_recommendation, anime_semantic_search
 )
 
