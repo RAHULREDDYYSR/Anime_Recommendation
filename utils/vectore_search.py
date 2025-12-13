@@ -1,6 +1,5 @@
 import os
 from langchain_huggingface import HuggingFaceEmbeddings
-from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import Chroma
 from langchain_pinecone import PineconeVectorStore
 from dotenv import load_dotenv
@@ -16,87 +15,59 @@ except ImportError:
 
 # Global cache for non-Streamlit environments
 _embeddings_cache = None
-# Global cache for non-Streamlit environments
-_embeddings_cache_hf = None
-_embeddings_cache_openai = None
 _vectorstore_cache_pinecone = None
 _vectorstore_cache_chroma = None
 
-def get_embeddings(model_source: str = "HuggingFace"):
+def get_embeddings():
     """
-    Returns cached embeddings (singleton) based on source.
+    Returns cached HuggingFace embeddings (singleton).
     """
     if HAS_STREAMLIT:
-        if model_source == "OpenAI":
-            return _get_embeddings_openai_streamlit()
         return _get_embeddings_streamlit()
     else:
-        if model_source == "OpenAI":
-            return _get_embeddings_openai_global()
         return _get_embeddings_global()
 
-@st.cache_resource(show_spinner="Loading embedding model...")
+@st.cache_resource(show_spinner="Loading HuggingFace embedding model...")
 def _get_embeddings_streamlit():
     """Streamlit-cached version (HuggingFace)"""
-    print("Initializing embedding model (HuggingFace)...")
+    print("Initializing HuggingFace embedding model...")
     embeddings = HuggingFaceEmbeddings(
         model_name="sentence-transformers/all-MiniLM-L6-v2"
     )
-    print("Embedding model loaded successfully!")
-    return embeddings
-
-@st.cache_resource(show_spinner="Loading OpenAI embeddings...")
-def _get_embeddings_openai_streamlit():
-    """Streamlit-cached version (OpenAI)"""
-    print("Initializing embedding model (OpenAI)...")
-    # Assuming OPENAI_API_KEY is in .env
-    embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
-    print("Embedding model loaded successfully!")
+    print("HuggingFace embedding model loaded successfully!")
     return embeddings
 
 def _get_embeddings_global():
-    """Global cache version for non-Streamlit environments (HF)"""
-    global _embeddings_cache_hf
+    """Global cache version for non-Streamlit environments (HuggingFace)"""
+    global _embeddings_cache
     
-    if _embeddings_cache_hf is None:
-        print("Initializing embedding model (first time only)...")
-        _embeddings_cache_hf = HuggingFaceEmbeddings(
+    if _embeddings_cache is None:
+        print("Initializing HuggingFace embedding model (first time only)...")
+        _embeddings_cache = HuggingFaceEmbeddings(
             model_name="sentence-transformers/all-MiniLM-L6-v2"
         )
-        print("Embedding model loaded successfully!")
+        print("HuggingFace embedding model loaded successfully!")
     
-    return _embeddings_cache_hf
+    return _embeddings_cache
 
-def _get_embeddings_openai_global():
-    """Global cache version for non-Streamlit environments (OpenAI)"""
-    global _embeddings_cache_openai
-    
-    if _embeddings_cache_openai is None:
-        print("Initializing embedding model (OpenAI - first time only)...")
-        _embeddings_cache_openai = OpenAIEmbeddings(model="text-embedding-3-small")
-        print("Embedding model loaded successfully!")
-    
-    return _embeddings_cache_openai
-
-def get_vectorstore(source: str = "Pinecone", embedding_model: str = "HuggingFace"):
+def get_vectorstore(source: str = "Pinecone"):
     """
-    Returns cached vectorstore (singleton) based on source and embedding model.
+    Returns cached vectorstore (singleton) based on source.
+    Always uses HuggingFace embeddings.
     """
     if HAS_STREAMLIT:
         if source == "ChromaDB":
-             return _get_vectorstore_chroma_streamlit(embedding_model)
-        return _get_vectorstore_pinecone_streamlit(embedding_model)
+             return _get_vectorstore_chroma_streamlit()
+        return _get_vectorstore_pinecone_streamlit()
     else:
-        # Global caching for all combinations logic is becoming complex.
-        # Simplification: pass embedding_model to specific getters
         if source == "ChromaDB":
-             return _get_vectorstore_chroma_global(embedding_model)
-        return _get_vectorstore_pinecone_global(embedding_model)
+             return _get_vectorstore_chroma_global()
+        return _get_vectorstore_pinecone_global()
 
 @st.cache_resource(show_spinner="Connecting to Pinecone...")
-def _get_vectorstore_pinecone_streamlit(embedding_model: str = "HuggingFace"):
-    """Streamlit-cached version"""
-    embeddings = get_embeddings(embedding_model)
+def _get_vectorstore_pinecone_streamlit():
+    """Streamlit-cached version for Pinecone with HuggingFace embeddings"""
+    embeddings = get_embeddings()
     if not embeddings:
         return None
     
@@ -111,20 +82,13 @@ def _get_vectorstore_pinecone_streamlit(embedding_model: str = "HuggingFace"):
     return vectorstore
 
 @st.cache_resource(show_spinner="Connecting to ChromaDB...")
-def _get_vectorstore_chroma_streamlit(embedding_model: str = "HuggingFace"):
-    """Streamlit-cached version for ChromaDB"""
-    embeddings = get_embeddings(embedding_model)
+def _get_vectorstore_chroma_streamlit():
+    """Streamlit-cached version for ChromaDB with HuggingFace embeddings"""
+    embeddings = get_embeddings()
     if not embeddings:
         return None
     
-    # We might want separate directories for separate models if they share the same 'chroma_db' root but different collections.
-    # However, Chroma usually manages collections. Here we are using persist_directory which is the DB root.
-    # If the user switches models for the *same* DB, retrieving logic might fail if dimensions differ.
-    if embedding_model == "OpenAI":
-        persist_directory = "./chroma_db_openai"
-    else:
-        persist_directory = "./chroma_db"
-        
+    persist_directory = "./chroma_db"
     print(f"Connecting to ChromaDB at '{persist_directory}' (cached by Streamlit)...")
     
     vectorstore = Chroma(
@@ -134,19 +98,15 @@ def _get_vectorstore_chroma_streamlit(embedding_model: str = "HuggingFace"):
     print("ChromaDB connection established!")
     return vectorstore
 
-def _get_vectorstore_pinecone_global(embedding_model: str = "HuggingFace"):
+def _get_vectorstore_pinecone_global():
     """Global cache version for non-Streamlit environments (Pinecone)"""
-    # Note: Simplification - we are overwriting the global cache if model changes for simplicity in this script
     global _vectorstore_cache_pinecone
     
-    # In a real app we might want a dict cache keyed by model.
-    # For now, let's assume we just rebuild if needed or use what's there (risk of mismatch if using global cache for multiple models sequentially).
-    # Given the use case is single user local run, we can just fetch fresh.
-    
-    embeddings = get_embeddings(embedding_model)
-    if not embeddings:
-        return None
-        
+    if _vectorstore_cache_pinecone is None:
+        embeddings = get_embeddings()
+        if not embeddings:
+            return None
+            
         index_name = "anime-recommendation-v2"
         print(f"Connecting to Pinecone index '{index_name}' (first time only)...")
         
@@ -158,38 +118,33 @@ def _get_vectorstore_pinecone_global(embedding_model: str = "HuggingFace"):
     
     return _vectorstore_cache_pinecone
 
-def _get_vectorstore_chroma_global(embedding_model: str = "HuggingFace"):
+def _get_vectorstore_chroma_global():
     """Global cache version for non-Streamlit environments (ChromaDB)"""
-    # Simply returning a new instance or cached one.
     global _vectorstore_cache_chroma
     
-    # See note above about global cache invalidation.
-    embeddings = get_embeddings(embedding_model)
-    if not embeddings:
-        return None
-        
-    if embedding_model == "OpenAI":
-        persist_directory = "./chroma_db_openai"
-    else:
+    if _vectorstore_cache_chroma is None:
+        embeddings = get_embeddings()
+        if not embeddings:
+            return None
+            
         persist_directory = "./chroma_db"
+        print(f"Connecting to ChromaDB at '{persist_directory}' (first time only)...")
         
-    print(f"Connecting to ChromaDB at '{persist_directory}' (first time only)...")
-    
-    _vectorstore_cache_chroma = Chroma(
-        persist_directory=persist_directory,
-        embedding_function=embeddings
-    )
-    print("ChromaDB connection established!")
+        _vectorstore_cache_chroma = Chroma(
+            persist_directory=persist_directory,
+            embedding_function=embeddings
+        )
+        print("ChromaDB connection established!")
     
     return _vectorstore_cache_chroma
 
-def retrieve_anime_recommendations(query: str, k: int = 5, source: str = "Pinecone", embedding_model: str = "HuggingFace"):
+def retrieve_anime_recommendations(query: str, k: int = 5, source: str = "Pinecone"):
     """
     Performs semantic search to retrieve top k anime recommendations.
-    Uses cached embeddings and vectorstore based on source and model.
+    Uses cached HuggingFace embeddings and vectorstore based on source.
     """
     try:
-        vectorstore = get_vectorstore(source=source, embedding_model=embedding_model)
+        vectorstore = get_vectorstore(source=source)
         if not vectorstore:
             return []
         

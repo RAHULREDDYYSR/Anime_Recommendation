@@ -1,8 +1,6 @@
 import os
-import argparse
 import pandas as pd
 from langchain_huggingface import HuggingFaceEmbeddings
-from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import Chroma
 from langchain_core.documents import Document
 from dotenv import load_dotenv
@@ -50,37 +48,29 @@ def extract_data(file_path):
         print(f"Error extracting data: {e}")
         return []
 
-def get_embeddings(model_source: str = "HuggingFace"):
+def get_embeddings():
     """
-    Initializes and returns embeddings based on source.
+    Initializes and returns HuggingFace embeddings.
     """
     try:
-        if model_source == "OpenAI":
-            print("Initializing OpenAI Embeddings...")
-            return OpenAIEmbeddings(model="text-embedding-3-small")
-        else:
-            print("Initializing HuggingFace Embeddings...")
-            return HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+        print("Initializing HuggingFace Embeddings...")
+        return HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
     except Exception as e:
         print(f"Error initializing embeddings: {e}")
         return None
 
-def ingest_to_chroma(documents, model_source="HuggingFace"):
+def ingest_to_chroma(documents):
     """
-    Ingests documents into a Chroma vectorstore.
+    Ingests documents into a Chroma vectorstore using HuggingFace embeddings.
     """
     try:
-        embeddings = get_embeddings(model_source)
+        embeddings = get_embeddings()
         if not embeddings:
             return
 
-        # Select persistence directory based on model
-        if model_source == "OpenAI":
-            persist_directory = "./chroma_db_openai"
-        else:
-            persist_directory = "./chroma_db"
+        persist_directory = "./chroma_db"
             
-        print(f"Ingesting {len(documents)} documents into Chroma DB at '{persist_directory}' using {model_source} embeddings...")
+        print(f"Ingesting {len(documents)} documents into Chroma DB at '{persist_directory}' using HuggingFace embeddings...")
         
         # Create or update the vector store
         vectorstore = Chroma.from_documents(
@@ -96,12 +86,8 @@ def ingest_to_chroma(documents, model_source="HuggingFace"):
         print(f"Error ingesting into Chroma: {e}")
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Ingest anime data into ChromaDB")
-    parser.add_argument("--model", type=str, default="HuggingFace", choices=["HuggingFace", "OpenAI"], help="Embedding model to use")
-    args = parser.parse_args()
-    
     DATA_PATH = "Data/mal_anime.csv"
     
     docs = extract_data(DATA_PATH)
     if docs:
-        ingest_to_chroma(docs, model_source=args.model)
+        ingest_to_chroma(docs)

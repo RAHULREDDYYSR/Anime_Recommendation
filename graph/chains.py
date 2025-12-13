@@ -10,7 +10,7 @@ def get_llm_chains(model_name: str = "Groq"):
     if model_name == "Gemini":
         llm = ChatGoogleGenerativeAI(model='gemini-2.5-flash-lite')
     elif model_name == "OpenAI":
-        llm = ChatOpenAI(model='gpt-4o-mini') # Using a standard model name, user can adjust
+        llm = ChatOpenAI(model='gpt-4.1-nano') # Using a standard model name, user can adjust
     else: # Default to Groq
         llm = ChatGroq(model='llama-3.3-70b-versatile')
 

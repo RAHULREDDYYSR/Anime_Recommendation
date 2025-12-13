@@ -29,19 +29,16 @@ def render_sidebar():
         - **LangGraph** for workflow
         - **LLMs** for query refinement
         - **Semantic Search** for recommendations
-        - **Pinecone** vector database
+        - **HuggingFace Embeddings** for vector search
         """)
         
         st.header("Settings")
-        num_recommendations = st.slider("Number of recommendations", 1, 10, 10)
-        show_images = st.checkbox("Show anime images", value=True)
         
         vector_source = st.radio("Vector Database", ["Pinecone", "ChromaDB"])
-        embedding_model = st.radio("Embedding Model", ["HuggingFace", "OpenAI"])
         
         llm_model = st.radio("LLM Model", ["Groq", "Gemini", "OpenAI"])
         
-        return num_recommendations, show_images, vector_source, embedding_model, llm_model
+        return vector_source, llm_model
 
 
 def render_anime_card_with_image(idx: int, anime: object):

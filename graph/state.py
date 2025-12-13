@@ -7,5 +7,4 @@ class GraphState(TypedDict):
     recommended_anime: List[dict] # Changed from List[str] to List[dict] to hold AnimeDetails
     context: List[str]
     vector_source: str # "Pinecone" or "ChromaDB"
-    embedding_model: str # "HuggingFace" or "OpenAI"
     llm_model: str # "Groq", "Gemini", or "OpenAI"

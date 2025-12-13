@@ -40,8 +40,8 @@ def anime_semantic_search(state: GraphState) -> GraphState:
     """
     query = state['redefine_input_content']
     vector_source = state.get('vector_source', 'Pinecone')
-    embedding_model = state.get('embedding_model', 'HuggingFace')
-    context = retrieve_anime_recommendations(query=query, k=15, source=vector_source, embedding_model=embedding_model)
+    # Always use HuggingFace embeddings
+    context = retrieve_anime_recommendations(query=query, k=10, source=vector_source)
     state['context'] = context
     return state
     
