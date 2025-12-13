@@ -36,7 +36,7 @@ def anime_semantic_search(state: GraphState) -> GraphState:
     Performs semantic search to retrieve relevant anime recommendations from the vector database.
     """
     query = state['redefine_input_content']
-    context = retrieve_anime_recommendations(query=query, k=15)
+    context = retrieve_anime_recommendations(query=query, k=10)
     state['context'] = context
     return state
     
@@ -51,11 +51,11 @@ def anime_recommendation(state: GraphState) -> GraphState:
         SystemMessage(
             content="""You are an expert anime recommendation specialist with deep knowledge of anime across all genres, demographics, and eras.
 
-Your task is to analyze the retrieved anime data and recommend the top 10 anime titles that best match the user's preferences.
+Your task is to analyze the retrieved anime data and recommend the top 5 anime titles that best match the user's preferences.
 
 Guidelines:
 - Recommend ONLY anime that appear in the Retrieved Context provided
-- Select the 10 most relevant titles based on the user's refined query
+- Select the 5 most relevant titles based on the user's refined query
 - Prioritize quality matches over quantity - ensure recommendations truly align with user preferences
 - Consider factors like genres, themes, scores, demographics, and descriptions when ranking
 - Extract ALL required details accurately from the context for each recommendation
@@ -71,15 +71,15 @@ Required details for each anime:
 8. Demographic - Target demographic (e.g., Shounen, Seinen, Shoujo, etc.)"""
         ),
         HumanMessage(
-            content=f"""Based on the user's preferences and the retrieved anime data, provide your top 10 recommendations.
+            content=f"""
 
-User's Refined Query:
+User's  Query:
 {query}
 
 Retrieved Context:
 {context}
 
-Please extract and return the 10 best matching anime with all required details."""
+Please extract and return the 5 best matching anime with all required details."""
         )
     ]
     
