@@ -28,6 +28,11 @@ Thumbs.db
 test_*.py
 verify_changes.py
 
+# data 
 chroma_db/
 
 chroma_db_openai/
+
+
+# langgraph api
+.langgraph_api/
