@@ -20,10 +20,7 @@ def render_custom_css():
 
 def render_sidebar():
     """
-    Render the sidebar with app information and settings.
-    
-    Returns:
-        tuple: (num_recommendations, show_images)
+    Render the sidebar with app information.
     """
     with st.sidebar:
         st.header("About")
@@ -34,12 +31,6 @@ def render_sidebar():
         - **Semantic Search** for recommendations
         - **Pinecone** vector database
         """)
-        
-        st.header("Settings")
-        num_recommendations = st.slider("Number of recommendations", 1, 10, 10)
-        show_images = st.checkbox("Show anime images", value=True)
-        
-        return num_recommendations, show_images
 
 
 def render_anime_card_with_image(idx: int, anime: object):
@@ -108,43 +99,22 @@ def render_anime_card_with_image(idx: int, anime: object):
         st.markdown("---")
 
 
-def render_anime_card_simple(idx: int, anime: object):
-    """
-    Render a simple anime recommendation card without image.
-    
-    Args:
-        idx: Index number for the recommendation
-        anime: AnimeDetails object or dict
-    """
-    if isinstance(anime, dict):
-        title = anime.get('title', 'Unknown Title')
-    else:
-        title = getattr(anime, 'title', 'Unknown Title')
-        
-    st.markdown(f"**{idx}. {title}**")
 
 
-def render_recommendations(recommendations: list, num_recommendations: int, show_images: bool, layout_style: str = "List"):
+
+def render_recommendations(recommendations: list, layout_style: str = "List"):
     """
-    Render the list of anime recommendations.
+    Render the list of anime recommendations with images.
     
     Args:
         recommendations: List of AnimeDetails objects
-        num_recommendations: Number of recommendations to display
-        show_images: Whether to show images or not
         layout_style: Layout style (for future expansion)
     """
     st.subheader("🎬 Recommended Anime:")
     
     if recommendations:
-        # Limit recommendations
-        anime_list = recommendations[:num_recommendations]
-        
-        for idx, anime in enumerate(anime_list, 1):
-            if show_images:
-                render_anime_card_with_image(idx, anime)
-            else:
-                render_anime_card_simple(idx, anime)
+        for idx, anime in enumerate(recommendations, 1):
+            render_anime_card_with_image(idx, anime)
     else:
         st.warning("No recommendations found. Try a different query!")
 

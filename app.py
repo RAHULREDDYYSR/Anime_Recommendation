@@ -25,8 +25,8 @@ render_custom_css()
 st.title("🎌 Anime Recommendation System")
 st.markdown("Powered by AI and semantic search")
 
-# Sidebar with settings
-num_recommendations, show_images = render_sidebar()
+# Sidebar
+render_sidebar()
 
 # Main interface
 user_query = st.text_input(
@@ -47,9 +47,9 @@ if st.button("Get Recommendations", type="primary") or user_query:
                 # Display success message
                 st.success(f"✨ Found recommendations in {end_time - start_time:.2f} seconds!")
                 
-                # Render recommendations
+                # Render recommendations with images
                 recommendations = result.get('recommended_anime', [])
-                render_recommendations(recommendations, num_recommendations, show_images)
+                render_recommendations(recommendations)
                     
             except Exception as e:
                 st.error(f"An error occurred: {e}")
