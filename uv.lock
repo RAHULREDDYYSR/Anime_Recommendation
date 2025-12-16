@@ -138,7 +138,9 @@ dependencies = [
     { name = "langchain-ollama" },
     { name = "langchain-openai" },
     { name = "langchain-pinecone" },
+    { name = "langchain-tavily" },
     { name = "langgraph" },
+    { name = "langgraph-cli" },
     { name = "langsmith" },
     { name = "pandas" },
     { name = "pinecone" },
@@ -160,7 +162,9 @@ requires-dist = [
     { name = "langchain-ollama", specifier = ">=1.0.0" },
     { name = "langchain-openai", specifier = ">=1.0.3" },
     { name = "langchain-pinecone", specifier = ">=0.2.13" },
+    { name = "langchain-tavily", specifier = ">=0.2.15" },
     { name = "langgraph", specifier = ">=1.0.3" },
+    { name = "langgraph-cli", specifier = ">=0.4.10" },
     { name = "langsmith", specifier = ">=0.4.45" },
     { name = "pandas", specifier = ">=2.3.3" },
     { name = "pinecone", specifier = ">=7.3.0" },
@@ -1211,6 +1215,21 @@ wheels = [
 ]
 
 [[package]]
+name = "langchain-tavily"
+version = "0.2.15"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "aiohttp" },
+    { name = "langchain" },
+    { name = "langchain-core" },
+    { name = "requests" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/cd/8d/6d94def41910759cadee3231fe2cea1309977de4a4038f45291535f3a444/langchain_tavily-0.2.15.tar.gz", hash = "sha256:4c3fefe7789d460c9724c68ac631e446e2a0d98a20285add81e7d810f5301397", size = 25148, upload-time = "2025-12-15T23:24:51.059Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/76/ce/b4fb821c27a7af8d465296b82933a75199507eb36aeeefb6b34a248d7abe/langchain_tavily-0.2.15-py3-none-any.whl", hash = "sha256:e7eb0dd956cad3cfb44f2bac5eddeb150845d7a2dbf369a2e5698144e79cdb14", size = 30621, upload-time = "2025-12-15T23:24:49.96Z" },
+]
+
+[[package]]
 name = "langchain-text-splitters"
 version = "1.0.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1250,6 +1269,19 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/0f/07/2b1c042fa87d40cf2db5ca27dc4e8dd86f9a0436a10aa4361a8982718ae7/langgraph_checkpoint-3.0.1.tar.gz", hash = "sha256:59222f875f85186a22c494aedc65c4e985a3df27e696e5016ba0b98a5ed2cee0", size = 137785, upload-time = "2025-11-04T21:55:47.774Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/48/e3/616e3a7ff737d98c1bbb5700dd62278914e2a9ded09a79a1fa93cf24ce12/langgraph_checkpoint-3.0.1-py3-none-any.whl", hash = "sha256:9b04a8d0edc0474ce4eaf30c5d731cee38f11ddff50a6177eead95b5c4e4220b", size = 46249, upload-time = "2025-11-04T21:55:46.472Z" },
+]
+
+[[package]]
+name = "langgraph-cli"
+version = "0.4.10"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "click" },
+    { name = "langgraph-sdk" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/11/79/6d05e94487432b31a9149b61a1f1689cbdff89f8043556f9aab264a3be87/langgraph_cli-0.4.10.tar.gz", hash = "sha256:f2becdff30c52f63643d9df786ff96eb37460ebb99a01974e23093f7a674c9c8", size = 835669, upload-time = "2025-12-15T22:53:35.24Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/37/d7/6d2918848c068d518d768c0d08d2a7c32c2a8d3611b4df8307b3319402c4/langgraph_cli-0.4.10-py3-none-any.whl", hash = "sha256:78ea87aa4341ecee3e51749f817914ff29996d77f8bf7d6cbbe43a2ba0878673", size = 41161, upload-time = "2025-12-15T22:53:34.18Z" },
 ]
 
 [[package]]

@@ -13,8 +13,9 @@ def get_llm_chains(model_name: str = "Groq"):
         llm = ChatOpenAI(model='gpt-4.1-nano') # Using a standard model name, user can adjust
     else: # Default to Groq
         llm = ChatGroq(model='llama-3.3-70b-versatile')
+    llm2 = ChatOpenAI(model='gpt-4.1-nano')
 
     redefine_input_llm = llm.with_structured_output(RefinedQuery)
-    recommended_Anime_llm = llm.with_structured_output(RecommendedAnime)
+    recommended_Anime_llm = llm2.with_structured_output(RecommendedAnime)
     
     return redefine_input_llm, recommended_Anime_llm
